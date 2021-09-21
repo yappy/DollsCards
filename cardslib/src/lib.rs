@@ -30,6 +30,7 @@ mod tests {
         assert_eq!(expected, cards::CARDS_NUM);
     }
 
+    #[test]
     fn decode() {
         let mut code = 0u32;
         for s in 0..4 {
