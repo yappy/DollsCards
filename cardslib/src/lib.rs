@@ -71,14 +71,14 @@ mod tests {
     #[test]
     #[should_panic]
     fn calc_hand_invalid_1() {
-        let hand = vec![0u32, 1u32, 2u32, 3u32];
+        let hand = vec![0u32; 4];
         cards::calc_hand(&hand);
     }
 
     #[test]
     #[should_panic]
     fn calc_hand_invalid_2() {
-        let hand = vec![0u32, 1u32, 2u32, 3u32, 4u32, 5u32];
+        let hand = vec![0u32; 6];
         cards::calc_hand(&hand);
     }
 }
