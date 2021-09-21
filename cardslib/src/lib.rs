@@ -236,6 +236,37 @@ mod tests {
     }
 
     #[test]
+    fn calc_hand_flash() {
+        let mut hand1 = vec![0u32; 0];
+        hand1.push(cards::encode(0, 12));
+        hand1.push(cards::encode(0, 0));
+        hand1.push(cards::encode(0, 3));
+        hand1.push(cards::encode(0, 5));
+        hand1.push(cards::encode(0, 10));
+        let mut hand2 = vec![0u32; 0];
+        hand2.push(cards::encode(1, 12));
+        hand2.push(cards::encode(1, 1));
+        hand2.push(cards::encode(1, 3));
+        hand2.push(cards::encode(1, 5));
+        hand2.push(cards::encode(1, 10));
+        let mut hand3 = vec![0u32; 0];
+        hand3.push(cards::encode(2, 12));
+        hand3.push(cards::encode(2, 11));
+        hand3.push(cards::encode(2, 10));
+        hand3.push(cards::encode(2, 9));
+        hand3.push(cards::encode(2, 7));
+
+        let (rank1, order1) = cards::calc_hand(&hand1);
+        let (rank2, order2) = cards::calc_hand(&hand2);
+        let (rank3, order3) = cards::calc_hand(&hand3);
+        assert_eq!(rank1, cards::Rank::Flash);
+        assert_eq!(rank2, cards::Rank::Flash);
+        assert_eq!(rank3, cards::Rank::Flash);
+        assert!(order1 < order2);
+        assert!(order2 < order3);
+    }
+
+    #[test]
     #[should_panic]
     fn calc_hand_invalid_1() {
         let hand = vec![0u32; 4];
