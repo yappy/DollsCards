@@ -5,11 +5,18 @@ mod cards{
 
     pub fn encode(suit: u32, number: u32) -> u32 {
         assert!(suit < SUIT_NUM && number < NUMBER_NUM);
+
         suit * NUMBER_NUM + number
     }
     pub fn decode(code: u32) -> (u32, u32) {
         assert!(code < CARDS_NUM);
+
         (code / NUMBER_NUM, code % NUMBER_NUM)
+    }
+
+    pub fn calc_hand(hand: &[u32]) {
+        assert!(hand.len() == 5);
+
     }
 }
 
@@ -59,5 +66,19 @@ mod tests {
     #[should_panic]
     fn decode_invalid() {
         cards::decode(cards::CARDS_NUM);
+    }
+
+    #[test]
+    #[should_panic]
+    fn calc_hand_invalid_1() {
+        let hand = vec![0u32, 1u32, 2u32, 3u32];
+        cards::calc_hand(&hand);
+    }
+
+    #[test]
+    #[should_panic]
+    fn calc_hand_invalid_2() {
+        let hand = vec![0u32, 1u32, 2u32, 3u32, 4u32, 5u32];
+        cards::calc_hand(&hand);
     }
 }
