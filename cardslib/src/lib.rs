@@ -31,7 +31,7 @@ mod cards{
         (code / NUMBER_NUM, code % NUMBER_NUM)
     }
 
-    // [u32; 5] => (Rank, kicker)
+    // [u32; 5] => (Rank, order)
     pub fn calc_hand(hand: &[u32]) -> (Rank, u32) {
         assert!(hand.len() == 5);
 
@@ -44,11 +44,14 @@ mod cards{
             nb[n as usize] += 1;
         }
 
-        if let Some(kicker) = find_quads(&nb) {
-            return (Rank::Quads, kicker)
+        if let Some(order) = find_quads(&nb) {
+            return (Rank::Quads, order)
+        }
+        if let Some(order) = find_fullhouse(&nb) {
+            return (Rank::FullHouse, order)
         }
 
-        // TODO: kicker
+        // TODO: order
         (Rank::High, 0)
     }
 
@@ -77,6 +80,23 @@ mod cards{
             .map(|idx| idx as u32);
         let kicker = nb.iter()
             .rposition(|&count| count == 1)
+            .map(|idx| idx as u32);
+
+        match found {
+            None => None,
+            Some(num) => Some(create_order(&[num, kicker.unwrap()]))
+        }
+    }
+
+    fn find_fullhouse(nb: &[i32]) -> Option<u32> {
+        assert!(nb.len() == NUMBER_NUM as usize);
+
+        // find idx where nb[idx] == 3 and 2
+        let found = nb.iter()
+            .position(|&count| count == 3)
+            .map(|idx| idx as u32);
+        let kicker = nb.iter()
+            .position(|&count| count == 2)
             .map(|idx| idx as u32);
 
         match found {
