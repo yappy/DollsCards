@@ -139,6 +139,37 @@ mod tests {
     }
 
     #[test]
+    fn calc_hand_quads() {
+        let mut hand1 = vec![0u32; 0];
+        hand1.push(cards::encode(0, 0));
+        hand1.push(cards::encode(1, 0));
+        hand1.push(cards::encode(2, 0));
+        hand1.push(cards::encode(3, 0));
+        hand1.push(cards::encode(0, 1));
+        let mut hand2 = vec![0u32; 0];
+        hand2.push(cards::encode(0, 12));
+        hand2.push(cards::encode(1, 12));
+        hand2.push(cards::encode(2, 12));
+        hand2.push(cards::encode(3, 12));
+        hand2.push(cards::encode(0, 1));
+        let mut hand3 = vec![0u32; 0];
+        hand3.push(cards::encode(0, 12));
+        hand3.push(cards::encode(1, 12));
+        hand3.push(cards::encode(2, 12));
+        hand3.push(cards::encode(3, 12));
+        hand3.push(cards::encode(0, 2));
+
+        let (rank1, kicker1) = cards::calc_hand(&hand1);
+        let (rank2, kicker2) = cards::calc_hand(&hand2);
+        let (rank3, kicker3) = cards::calc_hand(&hand3);
+        assert_eq!(rank1, cards::Rank::Quads);
+        assert_eq!(rank2, cards::Rank::Quads);
+        assert_eq!(rank3, cards::Rank::Quads);
+        assert!(kicker1 < kicker2);
+        assert!(kicker2 < kicker3);
+    }
+
+    #[test]
     #[should_panic]
     fn calc_hand_invalid_1() {
         let hand = vec![0u32; 4];
@@ -149,6 +180,13 @@ mod tests {
     #[should_panic]
     fn calc_hand_invalid_2() {
         let hand = vec![0u32; 6];
+        cards::calc_hand(&hand);
+    }
+
+    #[test]
+    #[should_panic]
+    fn calc_hand_invalid_3() {
+        let hand = vec![0u32, 1u32, 2u32, 3u32, 100];
         cards::calc_hand(&hand);
     }
 }
