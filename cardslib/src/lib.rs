@@ -31,6 +31,18 @@ mod tests {
     }
 
     #[test]
+    #[should_panic]
+    fn encode_invalid_1() {
+        cards::encode(0, 13);
+    }
+
+    #[test]
+    #[should_panic]
+    fn encode_invalid_2() {
+        cards::encode(0, 13);
+    }
+
+    #[test]
     fn decode() {
         let mut code = 0u32;
         for s in 0..4 {
@@ -45,13 +57,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn invalid_encode1() {
-        cards::encode(0, 13);
-    }
-
-    #[test]
-    #[should_panic]
-    fn invalid_encode2() {
-        cards::encode(0, 13);
+    fn decode_invalid() {
+        cards::decode(cards::CARDS_NUM);
     }
 }
