@@ -44,7 +44,7 @@ mod cards{
             nb[n as usize] += 1;
         }
 
-        if let Ok(kicker) = find_quads(&nb) {
+        if let Some(kicker) = find_quads(&nb) {
             return (Rank::Quads, kicker)
         }
 
@@ -54,38 +54,34 @@ mod cards{
 
     // number list (len <= 5) => single integer (<= 20 bit)
     // num_list[0] is the most significant.
-    fn create_kicker(num_list: &[u32]) -> u32 {
+    fn create_order(num_list: &[u32]) -> u32 {
         assert!(num_list.len() <= 5);
 
         let mut value = 0u32;
-        for num in num_list {
-            assert!(*num < NUMBER_NUM);
+        for &num in num_list {
+            assert!(num < NUMBER_NUM);
             value <<= 4;
-            value |= *num;
+            value |= num;
         }
 
         value
     }
 
-    fn find_quads(nb: &[i32]) -> Result<u32, ()> {
+    fn find_quads(nb: &[i32]) -> Option<u32> {
         assert!(nb.len() == NUMBER_NUM as usize);
 
-        let mut found = -1;
-        let mut kicker = -1;
-        for i in (0..nb.len()).rev() {
-            if nb[i] == 4 {
-                assert!(found == -1);
-                found = i as i32;
-            }
-            if nb[i] == 1 {
-                assert!(kicker == -1);
-                kicker = i as i32;
-            }
-        }
+        // find idx where nb[idx] == 4 and 1
+        // search from the last
+        let found = nb.iter()
+            .rposition(|&count| count == 4)
+            .map(|idx| idx as u32);
+        let kicker = nb.iter()
+            .rposition(|&count| count == 1)
+            .map(|idx| idx as u32);
 
         match found {
-            -1 => Err(()),
-            _ => Ok(create_kicker(&[found as u32, kicker as u32]))
+            None => None,
+            Some(num) => Some(create_order(&[num, kicker.unwrap()]))
         }
     }
 }
