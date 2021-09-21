@@ -174,14 +174,45 @@ mod tests {
         hand3.push(cards::encode(3, 12));
         hand3.push(cards::encode(0, 2));
 
-        let (rank1, kicker1) = cards::calc_hand(&hand1);
-        let (rank2, kicker2) = cards::calc_hand(&hand2);
-        let (rank3, kicker3) = cards::calc_hand(&hand3);
+        let (rank1, order1) = cards::calc_hand(&hand1);
+        let (rank2, order2) = cards::calc_hand(&hand2);
+        let (rank3, order3) = cards::calc_hand(&hand3);
         assert_eq!(rank1, cards::Rank::Quads);
         assert_eq!(rank2, cards::Rank::Quads);
         assert_eq!(rank3, cards::Rank::Quads);
-        assert!(kicker1 < kicker2);
-        assert!(kicker2 < kicker3);
+        assert!(order1 < order2);
+        assert!(order2 < order3);
+    }
+
+    #[test]
+    fn calc_hand_fullhouse() {
+        let mut hand1 = vec![0u32; 0];
+        hand1.push(cards::encode(0, 0));
+        hand1.push(cards::encode(1, 1));
+        hand1.push(cards::encode(2, 0));
+        hand1.push(cards::encode(3, 1));
+        hand1.push(cards::encode(0, 0));
+        let mut hand2 = vec![0u32; 0];
+        hand2.push(cards::encode(0, 1));
+        hand2.push(cards::encode(1, 0));
+        hand2.push(cards::encode(2, 1));
+        hand2.push(cards::encode(3, 0));
+        hand2.push(cards::encode(0, 1));
+        let mut hand3 = vec![0u32; 0];
+        hand3.push(cards::encode(0, 12));
+        hand3.push(cards::encode(1, 12));
+        hand3.push(cards::encode(2, 12));
+        hand3.push(cards::encode(3, 11));
+        hand3.push(cards::encode(0, 11));
+
+        let (rank1, order1) = cards::calc_hand(&hand1);
+        let (rank2, order2) = cards::calc_hand(&hand2);
+        let (rank3, order3) = cards::calc_hand(&hand3);
+        assert_eq!(rank1, cards::Rank::FullHouse);
+        assert_eq!(rank2, cards::Rank::FullHouse);
+        assert_eq!(rank3, cards::Rank::FullHouse);
+        assert!(order1 < order2);
+        assert!(order2 < order3);
     }
 
     #[test]
