@@ -1,8 +1,18 @@
 #[allow(dead_code)]
 mod cards{
+    // A hand is 5-cards-set
     pub const HAND_SIZE: usize = 5;
+    // 4 suits
     pub const SUIT_NUM: u32 = 4;
+    // 13 numbers, higher code means higher card
+    // 0: 2
+    // 1: 3
+    // ...
+    // 10: Q
+    // 11: K
+    // 12: A
     pub const NUMBER_NUM: u32 = 13;
+    // 52 cards
     pub const CARDS_NUM: u32 = SUIT_NUM * NUMBER_NUM;
 
     #[derive(Debug, PartialEq, Eq)]
@@ -51,7 +61,14 @@ mod cards{
         nl_sorted.reverse();
 
         let flash = find_flash(&sb, &nl_sorted);
+        let straight = find_straight(&nl_sorted);
 
+        if let Some(order) = straight {
+            if let Some(_) = flash {
+                // use straight order
+                return (Rank::StraightFlash, order)
+            }
+        }
         if let Some(order) = find_quads(&nb) {
             return (Rank::Quads, order)
         }
@@ -60,6 +77,9 @@ mod cards{
         }
         if let Some(order) = flash {
             return (Rank::Flash, order)
+        }
+        if let Some(order) = straight {
+            return (Rank::Straight, order)
         }
 
         // TODO: order
@@ -122,6 +142,35 @@ mod cards{
         let found = sb.iter().find(|&&count| count == 5);
 
         found.map(|_| create_order(nl_sorted))
+    }
+
+    fn find_straight(nl_sorted: &[u32]) -> Option<u32> {
+        assert!(nl_sorted.len() == HAND_SIZE);
+
+        // A, 5, 4, 3, 2
+        let special: [u32; 5] = [12, 3, 2, 1, 0];
+        if *nl_sorted == special {
+            // order is 5 (=3)
+            return Some(3)
+        }
+
+        let start = nl_sorted[0];
+        let mut ok = true;
+        for (i, &num) in nl_sorted.iter().enumerate() {
+            let start = start as i32;
+            let i: i32 = i as i32;
+            let num: i32 = num as i32;
+            if num != start - i {
+                ok = false;
+                break
+            }
+        }
+        if ok {
+            // order is the highest number
+            return Some(start)
+        }
+
+        None
     }
 }
 
