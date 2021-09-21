@@ -1,5 +1,6 @@
 #[allow(dead_code)]
 mod cards{
+    pub const HAND_SIZE: usize = 5;
     pub const SUIT_NUM: u32 = 4;
     pub const NUMBER_NUM: u32 = 13;
     pub const CARDS_NUM: u32 = SUIT_NUM * NUMBER_NUM;
@@ -33,22 +34,32 @@ mod cards{
 
     // [u32; 5] => (Rank, order)
     pub fn calc_hand(hand: &[u32]) -> (Rank, u32) {
-        assert!(hand.len() == 5);
+        assert!(hand.len() == HAND_SIZE);
 
         // suit and number backet
         let mut sb = [0; SUIT_NUM as usize];
         let mut nb = [0; NUMBER_NUM as usize];
-        for code in hand {
-            let (s, n) = decode(*code);
+        // number list (descending order)
+        let mut nl_sorted = [0u32; HAND_SIZE];
+        for (i, &code) in hand.iter().enumerate() {
+            let (s, n) = decode(code);
             sb[s as usize] += 1;
             nb[n as usize] += 1;
+            nl_sorted[i] = n;
         }
+        nl_sorted.sort_unstable();
+        nl_sorted.reverse();
+
+        let flash = find_flash(&sb, &nl_sorted);
 
         if let Some(order) = find_quads(&nb) {
             return (Rank::Quads, order)
         }
         if let Some(order) = find_fullhouse(&nb) {
             return (Rank::FullHouse, order)
+        }
+        if let Some(order) = flash {
+            return (Rank::Flash, order)
         }
 
         // TODO: order
@@ -102,6 +113,15 @@ mod cards{
             None => None,
             Some(num) => Some(create_order(&[num, kicker.unwrap()]))
         }
+    }
+
+    fn find_flash(sb: &[i32], nl_sorted: &[u32]) -> Option<u32> {
+        assert!(sb.len() == SUIT_NUM as usize);
+        assert!(nl_sorted.len() == HAND_SIZE);
+
+        let found = sb.iter().find(|&&count| count == 5);
+
+        found.map(|_| create_order(nl_sorted))
     }
 }
 
