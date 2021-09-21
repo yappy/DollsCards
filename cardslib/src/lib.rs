@@ -74,12 +74,11 @@ mod cards{
         assert!(nb.len() == NUMBER_NUM as usize);
 
         // find idx where nb[idx] == 4 and 1
-        // search from the last
         let found = nb.iter()
-            .rposition(|&count| count == 4)
+            .position(|&count| count == 4)
             .map(|idx| idx as u32);
         let kicker = nb.iter()
-            .rposition(|&count| count == 1)
+            .position(|&count| count == 1)
             .map(|idx| idx as u32);
 
         match found {
