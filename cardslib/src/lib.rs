@@ -1,5 +1,5 @@
 #[allow(dead_code)]
-mod cards{
+mod cards {
     // A hand is 5-cards-set
     pub const HAND_SIZE: usize = 5;
     // 4 suits
@@ -81,6 +81,15 @@ mod cards{
         if let Some(order) = straight {
             return (Rank::Straight, order)
         }
+        if let Some(order) = find_trips(&nb) {
+            return (Rank::Trips, order)
+        }
+        if let Some(order) = find_twopair(&nb) {
+            return (Rank::TwoPair, order)
+        }
+        if let Some(order) = find_onepair(&nb) {
+            return (Rank::OnePair, order)
+        }
 
         // TODO: order
         (Rank::High, 0)
@@ -129,10 +138,13 @@ mod cards{
             .position(|&count| count == 2)
             .map(|idx| idx as u32);
 
-        match found {
-            None => None,
-            Some(num) => Some(create_order(&[num, kicker.unwrap()]))
+        if let Some(num) = found {
+            if let Some(knum) = kicker {
+                return Some(create_order(&[num, knum]))
+            }
         }
+
+        None
     }
 
     fn find_flash(sb: &[i32], nl_sorted: &[u32]) -> Option<u32> {
@@ -194,7 +206,7 @@ mod cards{
         // push into order[] at descending order
         nb.iter()
             .enumerate()
-            .filter(|(_, &count)| count != 3)
+            .filter(|(_, &count)| count > 0 && count != 3)
             .map(|(num, _)| num as u32)
             .rev()
             .for_each(|num| {
@@ -230,7 +242,7 @@ mod cards{
         // push into order[] at descending order
         nb.iter()
             .enumerate()
-            .filter(|(_, &count)| count != 2)
+            .filter(|(_, &count)| count > 0 && count != 2)
             .map(|(num, _)| num as u32)
             .rev()
             .for_each(|num| {
@@ -265,7 +277,7 @@ mod cards{
         // push into order[] at descending order
         nb.iter()
             .enumerate()
-            .filter(|(_, &count)| count != 2)
+            .filter(|(_, &count)| count > 0 && count != 2)
             .map(|(num, _)| num as u32)
             .rev()
             .for_each(|num| {
@@ -478,6 +490,37 @@ mod tests {
         assert_eq!(rank3, cards::Rank::StraightFlash);
         assert!(order1 < order2);
         assert!(order2 > order3);
+    }
+
+    #[test]
+    fn calc_hand_trips() {
+        let mut hand1 = vec![0u32; 0];
+        hand1.push(cards::encode(0, 5));
+        hand1.push(cards::encode(1, 0));
+        hand1.push(cards::encode(2, 6));
+        hand1.push(cards::encode(3, 0));
+        hand1.push(cards::encode(0, 0));
+        let mut hand2 = vec![0u32; 0];
+        hand2.push(cards::encode(0, 12));
+        hand2.push(cards::encode(1, 5));
+        hand2.push(cards::encode(2, 12));
+        hand2.push(cards::encode(3, 12));
+        hand2.push(cards::encode(0, 8));
+        let mut hand3 = vec![0u32; 0];
+        hand3.push(cards::encode(0, 12));
+        hand3.push(cards::encode(1, 12));
+        hand3.push(cards::encode(2, 6));
+        hand3.push(cards::encode(3, 8));
+        hand3.push(cards::encode(0, 12));
+
+        let (rank1, order1) = cards::calc_hand(&hand1);
+        let (rank2, order2) = cards::calc_hand(&hand2);
+        let (rank3, order3) = cards::calc_hand(&hand3);
+        assert_eq!(rank1, cards::Rank::Trips);
+        assert_eq!(rank2, cards::Rank::Trips);
+        assert_eq!(rank3, cards::Rank::Trips);
+        assert!(order1 < order2);
+        assert!(order2 < order3);
     }
 
     #[test]
