@@ -154,6 +154,7 @@ mod cards{
             return Some(3)
         }
 
+        // other sequential patterns
         let start = nl_sorted[0];
         let mut ok = true;
         for (i, &num) in nl_sorted.iter().enumerate() {
@@ -313,6 +314,68 @@ mod tests {
         assert_eq!(rank3, cards::Rank::Flash);
         assert!(order1 < order2);
         assert!(order2 < order3);
+    }
+
+    #[test]
+    fn calc_hand_straight() {
+        let mut hand1 = vec![0u32; 0];
+        hand1.push(cards::encode(0, 12));
+        hand1.push(cards::encode(1, 3));
+        hand1.push(cards::encode(2, 1));
+        hand1.push(cards::encode(3, 2));
+        hand1.push(cards::encode(0, 0));
+        let mut hand2 = vec![0u32; 0];
+        hand2.push(cards::encode(0, 7));
+        hand2.push(cards::encode(1, 10));
+        hand2.push(cards::encode(2, 11));
+        hand2.push(cards::encode(3, 9));
+        hand2.push(cards::encode(0, 8));
+        let mut hand3 = vec![0u32; 0];
+        hand3.push(cards::encode(0, 0));
+        hand3.push(cards::encode(1, 2));
+        hand3.push(cards::encode(2, 4));
+        hand3.push(cards::encode(3, 3));
+        hand3.push(cards::encode(0, 1));
+
+        let (rank1, order1) = cards::calc_hand(&hand1);
+        let (rank2, order2) = cards::calc_hand(&hand2);
+        let (rank3, order3) = cards::calc_hand(&hand3);
+        assert_eq!(rank1, cards::Rank::Straight);
+        assert_eq!(rank2, cards::Rank::Straight);
+        assert_eq!(rank3, cards::Rank::Straight);
+        assert!(order1 < order2);
+        assert!(order2 > order3);
+    }
+
+    #[test]
+    fn calc_hand_straight_flash() {
+        let mut hand1 = vec![0u32; 0];
+        hand1.push(cards::encode(0, 12));
+        hand1.push(cards::encode(0, 3));
+        hand1.push(cards::encode(0, 1));
+        hand1.push(cards::encode(0, 2));
+        hand1.push(cards::encode(0, 0));
+        let mut hand2 = vec![0u32; 0];
+        hand2.push(cards::encode(1, 7));
+        hand2.push(cards::encode(1, 10));
+        hand2.push(cards::encode(1, 11));
+        hand2.push(cards::encode(1, 9));
+        hand2.push(cards::encode(1, 8));
+        let mut hand3 = vec![0u32; 0];
+        hand3.push(cards::encode(2, 0));
+        hand3.push(cards::encode(2, 2));
+        hand3.push(cards::encode(2, 4));
+        hand3.push(cards::encode(2, 3));
+        hand3.push(cards::encode(2, 1));
+
+        let (rank1, order1) = cards::calc_hand(&hand1);
+        let (rank2, order2) = cards::calc_hand(&hand2);
+        let (rank3, order3) = cards::calc_hand(&hand3);
+        assert_eq!(rank1, cards::Rank::StraightFlash);
+        assert_eq!(rank2, cards::Rank::StraightFlash);
+        assert_eq!(rank3, cards::Rank::StraightFlash);
+        assert!(order1 < order2);
+        assert!(order2 > order3);
     }
 
     #[test]
