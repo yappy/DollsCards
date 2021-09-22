@@ -17,7 +17,7 @@ mod cards {
 
     #[derive(Debug, PartialEq, Eq)]
     pub enum Rank {
-        High,
+        HighCard,
         OnePair,
         TwoPair,
         Trips,
@@ -91,8 +91,7 @@ mod cards {
             return (Rank::OnePair, order)
         }
 
-        // TODO: order
-        (Rank::High, 0)
+        (Rank::HighCard, find_highcard(&nl_sorted))
     }
 
     // number list (len <= 5) => single integer (<= 20 bit)
@@ -286,6 +285,13 @@ mod cards {
             });
 
         Some(create_order(&order[..size]))
+    }
+
+    fn find_highcard(nl_sorted: &[u32]) -> u32 {
+        assert!(nl_sorted.len() == HAND_SIZE as usize);
+
+        // use sorted (discending) number list
+        create_order(&nl_sorted)
     }
 }
 
@@ -583,6 +589,46 @@ mod tests {
         assert_eq!(rank3, cards::Rank::OnePair);
         assert!(order1 < order2);
         assert!(order2 < order3);
+    }
+
+    #[test]
+    fn calc_hand_highcard() {
+        let mut hand1 = vec![0u32; 0];
+        hand1.push(cards::encode(0, 0));
+        hand1.push(cards::encode(1, 1));
+        hand1.push(cards::encode(2, 2));
+        hand1.push(cards::encode(3, 3));
+        hand1.push(cards::encode(0, 5));
+        let mut hand2 = vec![0u32; 0];
+        hand2.push(cards::encode(0, 7));
+        hand2.push(cards::encode(1, 4));
+        hand2.push(cards::encode(2, 3));
+        hand2.push(cards::encode(3, 2));
+        hand2.push(cards::encode(0, 0));
+        let mut hand3 = vec![0u32; 0];
+        hand3.push(cards::encode(0, 7));
+        hand3.push(cards::encode(1, 4));
+        hand3.push(cards::encode(2, 3));
+        hand3.push(cards::encode(3, 1));
+        hand3.push(cards::encode(0, 2));
+        let mut hand4 = vec![0u32; 0];
+        hand4.push(cards::encode(0, 2));
+        hand4.push(cards::encode(1, 1));
+        hand4.push(cards::encode(2, 3));
+        hand4.push(cards::encode(3, 4));
+        hand4.push(cards::encode(0, 7));
+
+        let (rank1, order1) = cards::calc_hand(&hand1);
+        let (rank2, order2) = cards::calc_hand(&hand2);
+        let (rank3, order3) = cards::calc_hand(&hand3);
+        let (rank4, order4) = cards::calc_hand(&hand4);
+        assert_eq!(rank1, cards::Rank::HighCard);
+        assert_eq!(rank2, cards::Rank::HighCard);
+        assert_eq!(rank3, cards::Rank::HighCard);
+        assert_eq!(rank4, cards::Rank::HighCard);
+        assert!(order1 < order2);
+        assert!(order2 < order3);
+        assert!(order3 == order4);
     }
 
     #[test]
