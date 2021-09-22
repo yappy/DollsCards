@@ -173,6 +173,108 @@ mod cards{
 
         None
     }
+
+    fn find_trips(nb: &[i32]) -> Option<u32> {
+        assert!(nb.len() == NUMBER_NUM as usize);
+
+        let mut order = [NUMBER_NUM; HAND_SIZE];
+        let mut size = 0;
+
+        // find idx where nb[idx] == 3
+        let found = nb.iter()
+            .position(|&count| count == 3)
+            .map(|idx| idx as u32);
+        if found.is_none() {
+            return None
+        }
+        order[size] = found.unwrap();
+        size += 1;
+
+        // find all idx where nb[idx] != 3 (kicker)
+        // push into order[] at descending order
+        nb.iter()
+            .enumerate()
+            .filter(|(_, &count)| count != 3)
+            .map(|(num, _)| num as u32)
+            .rev()
+            .for_each(|num| {
+                order[size] = num;
+                size += 1;
+            });
+
+        Some(create_order(&order[..size]))
+    }
+
+    fn find_twopair(nb: &[i32]) -> Option<u32> {
+        assert!(nb.len() == NUMBER_NUM as usize);
+
+        let mut order = [NUMBER_NUM; HAND_SIZE];
+        let mut size = 0;
+
+        // find idx where nb[idx] == 2
+        // push into order[] at descending order
+        nb.iter()
+            .enumerate()
+            .filter(|(_, &count)| count == 2)
+            .map(|(num, _)| num as u32)
+            .rev()
+            .for_each(|num| {
+                order[size] = num;
+                size += 1;
+            });
+        if size != 2 {
+            return None
+        }
+
+        // find idx where nb[idx] != 2 (kicker)
+        // push into order[] at descending order
+        nb.iter()
+            .enumerate()
+            .filter(|(_, &count)| count != 2)
+            .map(|(num, _)| num as u32)
+            .rev()
+            .for_each(|num| {
+                order[size] = num;
+                size += 1;
+            });
+
+        Some(create_order(&order[..size]))
+    }
+
+    fn find_onepair(nb: &[i32]) -> Option<u32> {
+        assert!(nb.len() == NUMBER_NUM as usize);
+
+        let mut order = [NUMBER_NUM; HAND_SIZE];
+        let mut size = 0;
+
+        // find idx where nb[idx] == 2
+        nb.iter()
+            .enumerate()
+            .filter(|(_, &count)| count == 2)
+            .map(|(num, _)| num as u32)
+            .rev()
+            .for_each(|num| {
+                order[size] = num;
+                size += 1;
+            });
+        if size != 1 {
+            return None
+        }
+
+        // find idx where nb[idx] != 2 (kicker)
+        // push into order[] at descending order
+        nb.iter()
+            .enumerate()
+            .filter(|(_, &count)| count != 2)
+            .map(|(num, _)| num as u32)
+            .rev()
+            .for_each(|num| {
+                order[size] = num;
+                size += 1;
+            });
+
+        Some(create_order(&order[..size]))
+    }
 }
 
 #[cfg(test)]
