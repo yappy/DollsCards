@@ -42,6 +42,43 @@ mod cards {
         (code / NUMBER_NUM, code % NUMBER_NUM)
     }
 
+    pub fn all_case(fixed_cards: &[u32], size: usize) -> Vec<Vec<u32>>
+    {
+        assert!(fixed_cards.len() <= size);
+
+        let mut used = [false; CARDS_NUM as usize];
+        let mut state: Vec<u32> = Vec::new();
+        let mut result: Vec<Vec<u32>> = Vec::new();
+
+        for &num in fixed_cards {
+            used[num as usize] = true;
+        }
+        all_case_rec(&mut state, size, 0, &used, &mut result);
+
+        result
+    }
+
+    fn all_case_rec(
+        state: &mut Vec<u32>, size: usize, start: u32,
+        used: &[bool], result: &mut Vec<Vec<u32>>)
+    {
+        if state.len() >= size {
+            // copy and push a case
+            result.push(state.to_vec());
+            return
+        }
+
+        for num in start..CARDS_NUM {
+            let numind: usize = num as usize;
+            if used[numind] {
+                continue
+            }
+            state.push(num);
+            all_case_rec(state, size, num + 1, used, result);
+            state.pop();
+        }
+    }
+
     // [u32; 5] => (Rank, order)
     pub fn calc_hand(hand: &[u32]) -> (Rank, u32) {
         assert!(hand.len() == HAND_SIZE);
@@ -341,6 +378,24 @@ mod tests {
     #[should_panic]
     fn decode_invalid() {
         cards::decode(cards::CARDS_NUM);
+    }
+
+    #[test]
+    fn all_case() {
+        let result = cards::all_case(&[], 2);
+        assert_eq!(result.len(), 52 * 51 / 2);
+    }
+
+    #[test]
+    fn all_case_fixed() {
+        // AA
+        let my_hand = [
+            cards::encode(0, 12),
+            cards::encode(1, 12),
+        ];
+        let result = cards::all_case(&my_hand, 2);
+        assert_eq!(result.len(), 50 * 49 / 2);
+
     }
 
     #[test]
