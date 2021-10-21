@@ -1,6 +1,9 @@
+use git_version::git_version;
 use actix_web::{get, App, HttpResponse, HttpServer, Responder};
 use serde::{Serialize, Deserialize};
 use serde_json;
+
+const GIT_VERSION: &str = git_version!();
 
 #[get("/")]
 async fn hello() -> impl Responder {
@@ -17,7 +20,7 @@ struct InfoObj {
 async fn info() -> impl Responder {
     let info = InfoObj {
         description: "now testing...".to_string(),
-        version: "0.1".to_string(),
+        version: GIT_VERSION.to_string(),
     };
     let body = serde_json::to_string(&info).unwrap();
 
